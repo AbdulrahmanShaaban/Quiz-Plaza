@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700&family=Bebas+Neue&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+  /* Cartoon Ninja World Theme Colors */
+  --primary: #1A1A2E;
+  --secondary: #E94560;
+  --accent: #F5A623;
+  --background: #FAFAFA;
+  --highlight: #7B2FBE;
+  --card: #FFFFFF;
+  --text: #1A1A2E;
+
+  /* Tailwind UI mappings */
+  --foreground: var(--text);
+  --card-foreground: var(--text);
+  --popover: var(--card);
+  --popover-foreground: var(--text);
+  --primary-foreground: #FFFFFF;
+  --secondary-foreground: #FFFFFF;
+  --muted: #e2e8f0;
+  --muted-foreground: #64748b;
+  --accent-foreground: #FFFFFF;
+  --destructive: #ef4444;
+  --success: #10b981;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: var(--secondary);
+  --radius: 1rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Font families */
+  --font-sans: 'Nunito', sans-serif;
+  --font-heading: 'Bangers', cursive;
+  --font-score: 'Bebas Neue', sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Nunito', sans-serif;
+}
+
+h1, h2, h3 { 
+  font-family: 'Bangers', cursive; 
+  letter-spacing: 0.05em; 
+}
+
+.score, .number { 
+  font-family: 'Bebas Neue', sans-serif; 
+}
