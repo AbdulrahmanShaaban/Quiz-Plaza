@@ -4,7 +4,7 @@ import { Document } from 'mongoose';
 // This resolves the conflict between Passport's Express.User and our Mongoose IUser
 declare global {
   namespace Express {
-    interface User {
+    interface User extends Document {
       _id: any;
       name: string;
       email: string;
