@@ -22,7 +22,7 @@ export default function StatsCard({ title, value, icon: Icon }: StatsCardProps) 
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-4xl font-score text-primary tracking-wide">{value}</p>
+          <p className="text-4xl font-numbers text-primary tracking-wide">{value}</p>
         </CardContent>
       </Card>
     </motion.div>

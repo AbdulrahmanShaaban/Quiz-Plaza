@@ -24,15 +24,15 @@ export default function QuestionCard({
       animate="visible"
       exit="exit"
     >
-      <Card className="border-border/80 bg-card/90">
+      <Card className="border-2 border-border bg-white rounded-2xl shadow-md">
         <CardHeader>
-          <p className="text-sm font-medium text-accent">
+          <p className="text-sm font-heading text-accent tracking-wide">
             Question {questionIndex + 1} / {totalQuestions}
           </p>
-          <CardTitle className="text-lg leading-snug sm:text-xl">{question.text}</CardTitle>
+          <CardTitle className="text-xl leading-snug sm:text-2xl font-sans font-bold text-text">{question.text}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Choose the best answer</p>
+          <p className="text-sm text-text/70 font-sans font-bold">Choose the best answer</p>
         </CardContent>
       </Card>
     </motion.div>

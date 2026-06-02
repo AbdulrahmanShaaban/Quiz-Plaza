@@ -16,6 +16,8 @@ import { useAuthStore } from "@/lib/store/authStore";
 import { useGameStore } from "@/lib/store/gameStore";
 import type { Room } from "@/types/room";
 import type { RoomPlayer } from "@/types/room";
+import Panda from "@/components/characters/Panda";
+import EditRoomSettingsModal from "@/components/rooms/EditRoomSettingsModal";
 
 function mapPlayers(room: Room): RoomPlayer[] {
   return room.players.map((p) => {
@@ -87,6 +89,12 @@ export default function WaitingRoomPage() {
       s?.on("game_started", () => {
         router.push(`/game/${code}`);
       });
+      s?.on("room_updated", (data: { category: string; difficulty: string; questionsCount: number; isPublic: boolean }) => {
+        setRoom((prev) => prev ? { ...prev, ...data } as Room : null);
+      });
+      s?.on("room_closed", () => {
+        router.push("/rooms");
+      });
     });
 
     return cleanup;
@@ -104,20 +112,24 @@ export default function WaitingRoomPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-2xl p-6">
-        <Skeleton className="h-80 w-full" />
+      <div className="min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
+        <div className="mx-auto max-w-2xl p-6">
+          <Skeleton className="h-80 w-full rounded-2xl" />
+        </div>
       </div>
     );
   }
 
   if (error || !room) {
     return (
-      <PageTransition className="mx-auto max-w-lg p-8 text-center">
-        <p className="text-destructive">{error ?? "Room not found"}</p>
-        <Button className="mt-4" onClick={() => router.push("/rooms")}>
-          Back to rooms
-        </Button>
-      </PageTransition>
+      <div className="min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
+        <PageTransition className="mx-auto max-w-lg p-8 text-center">
+          <p className="text-destructive font-sans font-bold">{error ?? "Room not found"}</p>
+          <Button className="mt-4" onClick={() => router.push("/rooms")}>
+            Back to rooms
+          </Button>
+        </PageTransition>
+      </div>
     );
   }
 
@@ -127,79 +139,117 @@ export default function WaitingRoomPage() {
   );
 
   return (
-    <PageTransition className="mx-auto max-w-2xl px-4 py-8">
-      <Card className="border-border/80 bg-card/80">
-        <CardHeader>
-          <CardTitle>Waiting room</CardTitle>
-          <CardDescription>Share the code with friends to join</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center justify-center gap-3">
-            <span className="font-mono text-4xl font-bold tracking-[0.3em] text-primary">{code}</span>
-            <Button variant="ghost" size="icon" onClick={copyCode} aria-label="Copy code">
-              <Copy className="size-4" />
-            </Button>
-          </div>
-          {copied && <p className="text-center text-sm text-success">Copied!</p>}
+    <div className="min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
+      <PageTransition className="mx-auto max-w-2xl px-4 py-8 relative">
+        {/* Floating Panda mascot */}
+        <motion.div
+          animate={{ y: [0, -8, 0], rotate: [-2, 2, -2] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          className="absolute -right-4 top-0 hidden lg:block z-0 opacity-50"
+        >
+          <Panda className="w-24 h-24" />
+        </motion.div>
 
-          <div className="flex flex-wrap justify-center gap-2">
-            <Badge variant="outline" className="capitalize">{room.category}</Badge>
-            <Badge variant="outline" className="capitalize">{room.difficulty}</Badge>
-            <Badge variant="outline">{room.questionsCount} questions</Badge>
-          </div>
-
-          <div>
-            <h3 className="mb-3 text-sm font-medium text-muted-foreground">
-              Players ({uniquePlayers.length})
-            </h3>
-            <ul className="space-y-2">
-              {uniquePlayers.map((player, i) => (
-                <motion.li
-                  key={`${player.userId}-${i}`}
-                  variants={slideInBottom}
-                  initial="hidden"
-                  animate="visible"
-                  layout
-                  className="flex items-center gap-3 rounded-lg border border-border/50 px-3 py-2"
+        <motion.div
+          whileHover={{ y: -4 }}
+          className="relative z-10"
+        >
+          <Card className="border-2 border-border bg-white rounded-2xl shadow-md">
+            <CardHeader>
+              <CardTitle className="text-4xl font-heading text-primary tracking-wide">Waiting Room</CardTitle>
+              <CardDescription className="font-sans font-bold text-text/70 text-lg">Share the code with friends to join</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-center gap-3">
+                <span className="font-numbers text-5xl font-bold tracking-[0.3em] text-primary">{code}</span>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={copyCode}
+                  aria-label="Copy code"
+                  className="p-2 rounded-xl hover:bg-accent/20 transition-colors"
                 >
-                  <Avatar src={player.avatar} name={player.name} size="sm" />
-                  <span className="font-medium">{player.name}</span>
-                  {player.userId === hostId && (
-                    <Badge className="ml-auto bg-accent/20 text-accent">Host</Badge>
-                  )}
-                </motion.li>
-              ))}
-            </ul>
-          </div>
+                  <Copy className="size-6 text-accent" />
+                </motion.button>
+              </div>
+              {copied && <p className="text-center text-sm text-success font-sans font-bold">Copied!</p>}
 
-          {(socketError || error) && (
-            <p className="text-sm text-destructive text-center">{socketError ?? error}</p>
-          )}
+              <div className="flex flex-wrap justify-center gap-2">
+                <Badge variant="outline" className="capitalize border-accent text-accent font-sans font-bold">{room.category}</Badge>
+                <Badge variant="outline" className="capitalize border-accent text-accent font-sans font-bold">{room.difficulty}</Badge>
+                <Badge variant="outline" className="border-accent text-accent font-sans font-bold">{room.questionsCount} questions</Badge>
+                {isHost && (
+                  <EditRoomSettingsModal
+                    roomCode={code}
+                    currentSettings={{
+                      category: room.category,
+                      difficulty: room.difficulty,
+                      questionsCount: room.questionsCount,
+                      isPublic: room.isPublic,
+                    }}
+                    onUpdate={(settings) => {
+                      setRoom((prev) => prev ? { ...prev, ...settings } as Room : null);
+                    }}
+                  />
+                )}
+              </div>
 
-          {isHost ? (
-            <motion.div
-              animate={{ scale: [1, 1.02, 1] }}
-              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-            >
-              <Button
-                className="w-full"
-                size="lg"
-                disabled={uniquePlayers.length < 2}
-                onClick={handleStart}
-              >
-                <Play className="size-4" />
-                Start game
-              </Button>
-            </motion.div>
-          ) : (
-            <p className="text-center text-sm text-muted-foreground">Waiting for host to start…</p>
-          )}
+              <div>
+                <h3 className="mb-3 text-lg font-heading text-primary tracking-wide">
+                  Players ({uniquePlayers.length})
+                </h3>
+                <ul className="space-y-2">
+                  {uniquePlayers.map((player, i) => (
+                    <motion.li
+                      key={`${player.userId}-${i}`}
+                      variants={slideInBottom}
+                      initial="hidden"
+                      animate="visible"
+                      layout
+                      whileHover={{ y: -2 }}
+                      className="flex items-center gap-3 rounded-xl border-2 border-border bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <Avatar src={player.avatar} name={player.name} size="sm" />
+                      <span className="font-sans font-bold text-text">{player.name}</span>
+                      {player.userId === hostId && (
+                        <Badge className="ml-auto bg-accent/20 text-accent font-sans font-bold border-accent">Host</Badge>
+                      )}
+                    </motion.li>
+                  ))}
+                </ul>
+              </div>
 
-          {isHost && uniquePlayers.length < 2 && (
-            <p className="text-center text-xs text-muted-foreground">Need at least 2 players</p>
-          )}
-        </CardContent>
-      </Card>
-    </PageTransition>
+              {(socketError || error) && (
+                <p className="text-sm text-destructive text-center font-sans font-bold">{socketError ?? error}</p>
+              )}
+
+              {isHost ? (
+                <motion.div
+                  animate={{ scale: [1, 1.02, 1] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-full px-6 py-4 bg-secondary text-white font-heading tracking-widest text-2xl rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={uniquePlayers.length < 2}
+                    onClick={handleStart}
+                  >
+                    <Play className="size-5 inline mr-2" />
+                    Start Game
+                  </motion.button>
+                </motion.div>
+              ) : (
+                <p className="text-center text-lg text-text/70 font-sans font-bold">Waiting for host to start…</p>
+              )}
+
+              {isHost && uniquePlayers.length < 2 && (
+                <p className="text-center text-sm text-text/70 font-sans font-bold">Need at least 2 players</p>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </PageTransition>
+    </div>
   );
 }

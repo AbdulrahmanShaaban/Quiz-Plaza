@@ -16,6 +16,13 @@ const createRoomSchema = z.object({
   isPublic: z.boolean().default(true),
 });
 
+const updateRoomSchema = z.object({
+  category: z.enum(CATEGORIES),
+  difficulty: z.enum(DIFFICULTIES),
+  questionsCount: z.number().int().min(5).max(20),
+  isPublic: z.boolean(),
+});
+
 // --------------- Helpers ---------------
 
 const generateRoomCode = async (): Promise<string> => {
@@ -115,6 +122,64 @@ export const getRoomByCode = async (req: Request, res: Response): Promise<void> 
   } catch (error) {
     console.error("Get room by code error:", error);
     res.status(500).json({ message: "Server error fetching room." });
+  }
+};
+
+export const updateRoom = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { code } = req.params;
+    const { category, difficulty, questionsCount, isPublic } = updateRoomSchema.parse(req.body);
+
+    const room = await Room.findOne({ code });
+
+    if (!room) {
+      res.status(404).json({ message: "Room not found." });
+      return;
+    }
+
+    if (room.host.toString() !== req.user!._id.toString()) {
+      res.status(403).json({ message: "Only room host can update the room." });
+      return;
+    }
+
+    if (room.status !== "waiting") {
+      res.status(400).json({ message: "Can only update room settings while in waiting state." });
+      return;
+    }
+
+    // Get new question IDs if category or difficulty changed
+    let newQuestions = room.questions;
+    if (category !== room.category || difficulty !== room.difficulty || questionsCount !== room.questionsCount) {
+      newQuestions = await pickQuestionsForRoom(category, difficulty, questionsCount);
+    }
+
+    const updatedRoom = await Room.findByIdAndUpdate(
+      room._id,
+      {
+        category,
+        difficulty,
+        questionsCount,
+        questions: newQuestions,
+        isPublic,
+      },
+      { new: true }
+    ).populate("players.user", "name avatar");
+
+    res.json({
+      message: "Room updated successfully.",
+      room: updatedRoom,
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ message: error.issues[0].message });
+      return;
+    }
+    if (error instanceof NotEnoughQuestionsError) {
+      res.status(503).json({ message: error.message });
+      return;
+    }
+    console.error("Update room error:", error);
+    res.status(500).json({ message: "Server error updating room." });
   }
 };
 

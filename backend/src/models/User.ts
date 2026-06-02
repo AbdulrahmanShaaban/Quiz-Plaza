@@ -4,12 +4,15 @@ import bcrypt from "bcryptjs";
 export interface IUser extends Document {
   name: string;
   email: string;
-  password: string;
+  password?: string;
   avatar: string;
   role: "player" | "admin";
   isVerified: boolean;
   verificationCode?: string;
   verificationExpires?: Date;
+  provider?: "local" | "google" | "github";
+  googleId?: string;
+  githubId?: string;
   stats: {
     gamesPlayed: number;
     wins: number;
@@ -39,7 +42,9 @@ const userSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: function (this: IUser) {
+        return this.provider === "local";
+      },
       minlength: [6, "Password must be at least 6 characters"],
       select: false, // Never return password in queries by default
     },
@@ -64,6 +69,19 @@ const userSchema = new Schema<IUser>(
       type: Date,
       select: false,
     },
+    provider: {
+      type: String,
+      enum: ["local", "google", "github"],
+      default: "local",
+    },
+    googleId: {
+      type: String,
+      sparse: true, // Allows multiple null values for unique index
+    },
+    githubId: {
+      type: String,
+      sparse: true, // Allows multiple null values for unique index
+    },
     stats: {
       gamesPlayed: { type: Number, default: 0 },
       wins: { type: Number, default: 0 },
@@ -78,7 +96,7 @@ const userSchema = new Schema<IUser>(
 
 // Hash password before saving
 userSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
+  if (!this.isModified("password") || !this.password) return;
 
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);

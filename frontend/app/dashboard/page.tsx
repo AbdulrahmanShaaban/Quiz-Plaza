@@ -35,46 +35,58 @@ export default function DashboardPage() {
     stats.gamesPlayed > 0 ? `${Math.round((stats.wins / stats.gamesPlayed) * 100)}%` : "0%";
 
   return (
-    <PageTransition className="mx-auto max-w-6xl px-4 py-8 sm:px-6 relative">
-      {/* Floating Panda mascot in the corner */}
-      <motion.div
-        animate={{ y: [0, -8, 0], rotate: [-2, 2, -2] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -right-4 top-0 hidden lg:block z-0 opacity-50"
-      >
-        <Panda className="w-24 h-24" />
-      </motion.div>
+    <div className="min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
+      <PageTransition className="mx-auto max-w-6xl px-4 py-8 sm:px-6 relative">
+        {/* Floating Panda mascot in the corner */}
+        <motion.div
+          animate={{ y: [0, -8, 0], rotate: [-2, 2, -2] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          className="absolute -right-4 top-0 hidden lg:block z-0 opacity-50"
+        >
+          <Panda className="w-24 h-24" />
+        </motion.div>
 
-      {/* Welcome banner with waving Ninja */}
-      <div className="mb-10 bg-card rounded-3xl p-6 md:p-8 shadow-sm border-2 border-border flex flex-col sm:flex-row items-center gap-6 relative overflow-hidden z-10">
-        <div className="bg-primary/5 rounded-full p-4 shrink-0">
-          <motion.div
-            animate={{ rotate: [0, 15, -5, 15, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
-          >
-            <Ninja className="w-16 h-20 drop-shadow-md" />
-          </motion.div>
-        </div>
-        
-        <div className="flex-1 text-center sm:text-left">
-          <h1 className="text-4xl font-heading text-primary mb-2 tracking-wide">Hey, {user.name}!</h1>
-          <p className="text-text/70 font-sans text-lg font-bold">Ready for your next quiz battle?</p>
-        </div>
-
-        <div className="flex flex-wrap gap-3 justify-center sm:justify-end">
-          <CreateRoomModal />
-          <JoinRoomModal />
-          <Link href="/rooms">
-            <motion.button 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 bg-accent text-primary font-heading tracking-widest text-xl rounded-xl shadow-[0_4px_0_#c07b0c] hover:shadow-[0_2px_0_#c07b0c] hover:translate-y-[2px] transition-all"
+        {/* Welcome banner with waving Ninja */}
+        <motion.div 
+          whileHover={{ y: -4 }}
+          className="mb-10 bg-white rounded-2xl p-6 md:p-8 shadow-md border-2 border-border flex flex-col sm:flex-row items-center gap-6 relative overflow-hidden z-10"
+        >
+          <div className="bg-primary/5 rounded-full p-4 shrink-0">
+            <motion.div
+              animate={{ rotate: [0, 15, -5, 15, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
             >
-              Browse
-            </motion.button>
-          </Link>
-        </div>
-      </div>
+              <Ninja className="w-16 h-20 drop-shadow-md" />
+            </motion.div>
+          </div>
+          
+          <div className="flex-1 text-center sm:text-left">
+            <h1 className="text-4xl font-heading text-primary mb-2 tracking-wide">Hey, {user.name}!</h1>
+            <p className="text-text/70 font-sans text-lg font-bold">Ready for your next quiz battle?</p>
+          </div>
+          
+<div className="flex flex-wrap gap-3 justify-center sm:justify-end">
+  <CreateRoomModal />
+  <JoinRoomModal trigger={
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="px-6 py-3 bg-secondary text-white font-heading tracking-widest text-xl rounded-xl shadow-md hover:shadow-lg transition-all"
+    >
+      JOIN ROOM
+    </motion.button>
+  } />
+  <Link href="/rooms">
+    <motion.button 
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="px-6 py-3 bg-accent text-primary font-heading tracking-widest text-xl rounded-xl shadow-md hover:shadow-lg transition-all"
+    >
+      BROWSE
+    </motion.button>
+  </Link>
+</div>
+        </motion.div>
 
       {/* Stats Cards */}
       <StaggerList className="mb-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 relative z-10">
@@ -96,5 +108,6 @@ export default function DashboardPage() {
         <RecentGames />
       </div>
     </PageTransition>
+    </div>
   );
 }

@@ -8,7 +8,6 @@ import { z } from "zod";
 import PageTransition from "@/components/motion/PageTransition";
 import Avatar from "@/components/shared/Avatar";
 import StatsCard from "@/components/dashboard/StatsCard";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +16,7 @@ import api from "@/lib/axios";
 import { useAuthStore } from "@/lib/store/authStore";
 import { Gamepad2, Target, Trophy } from "lucide-react";
 import type { User } from "@/types/auth";
+import Panda from "@/components/characters/Panda";
 
 const schema = z.object({
   name: z.string().min(2).max(50),
@@ -73,58 +73,103 @@ export default function ProfilePage() {
 
   if (isLoading || !user) {
     return (
-      <div className="mx-auto max-w-2xl p-6">
-        <Skeleton className="h-64 w-full" />
+      <div className="min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
+        <div className="mx-auto max-w-2xl p-6">
+          <Skeleton className="h-64 w-full rounded-2xl" />
+        </div>
       </div>
     );
   }
 
   return (
-    <PageTransition className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">Profile</h1>
+    <div className="min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
+      <PageTransition className="mx-auto max-w-2xl px-4 py-8 relative">
+        {/* Floating Panda mascot */}
+        <motion.div
+          animate={{ y: [0, -8, 0], rotate: [-2, 2, -2] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          className="absolute -right-4 top-0 hidden lg:block z-0 opacity-50"
+        >
+          <Panda className="w-24 h-24" />
+        </motion.div>
 
-      <Card className="mb-6 border-border/80 bg-card/80">
-        <CardHeader>
-          <CardTitle>Avatar</CardTitle>
-          <CardDescription>Upload a profile image (max 5MB)</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center gap-4 sm:flex-row">
-          <motion.div whileHover={{ scale: 1.03 }}>
-            <Avatar src={user.avatar} name={user.name} size="lg" />
-          </motion.div>
-          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
-          <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading}>
-            {uploading ? "Uploading…" : "Change avatar"}
-          </Button>
-        </CardContent>
-      </Card>
+        <motion.div
+          whileHover={{ y: -4 }}
+          className="mb-8 bg-white rounded-2xl p-6 md:p-8 shadow-md border-2 border-border relative z-10"
+        >
+          <h1 className="text-4xl font-heading text-primary tracking-wide">Profile</h1>
+        </motion.div>
 
-      <Card className="mb-6 border-border/80 bg-card/80">
-        <CardHeader>
-          <CardTitle>Display name</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" {...register("name")} />
-              {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
-            </div>
-            {message && <p className="text-sm text-success">{message}</p>}
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" disabled={saving}>
-              {saving ? "Saving…" : "Save changes"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+        <motion.div
+          whileHover={{ y: -4 }}
+          className="mb-6 relative z-10"
+        >
+          <Card className="border-2 border-border bg-white rounded-2xl shadow-md">
+            <CardHeader>
+              <CardTitle className="text-2xl font-heading text-primary">Avatar</CardTitle>
+              <CardDescription className="font-sans font-bold text-text/70">Upload a profile image (max 5MB)</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center gap-4 sm:flex-row">
+              <motion.div whileHover={{ scale: 1.05 }}>
+                <Avatar src={user.avatar} name={user.name} size="lg" />
+              </motion.div>
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+                className="px-6 py-3 bg-accent text-primary font-heading tracking-widest text-xl rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {uploading ? "Uploading…" : "Change avatar"}
+              </motion.button>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-      <h2 className="mb-4 text-lg font-semibold">Your stats</h2>
-      <div className="grid gap-4 sm:grid-cols-3">
-        <StatsCard title="Games" value={user.stats.gamesPlayed} icon={Gamepad2} />
-        <StatsCard title="Wins" value={user.stats.wins} icon={Trophy} accent="accent" />
-        <StatsCard title="Best score" value={user.stats.bestScore} icon={Target} accent="success" />
-      </div>
-    </PageTransition>
+        <motion.div
+          whileHover={{ y: -4 }}
+          className="mb-6 relative z-10"
+        >
+          <Card className="border-2 border-border bg-white rounded-2xl shadow-md">
+            <CardHeader>
+              <CardTitle className="text-2xl font-heading text-primary">Display name</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="font-sans font-bold text-text">Name</Label>
+                  <Input id="name" {...register("name")} className="border-2 rounded-xl" />
+                  {errors.name && <p className="text-sm text-destructive font-sans font-bold">{errors.name.message}</p>}
+                </div>
+                {message && <p className="text-sm text-success font-sans font-bold">{message}</p>}
+                {error && <p className="text-sm text-destructive font-sans font-bold">{error}</p>}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="submit"
+                  disabled={saving}
+                  className="px-6 py-3 bg-secondary text-white font-heading tracking-widest text-xl rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {saving ? "Saving…" : "Save changes"}
+                </motion.button>
+              </form>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          whileHover={{ y: -4 }}
+          className="mb-4 bg-white rounded-2xl p-6 shadow-md border-2 border-border relative z-10"
+        >
+          <h2 className="text-2xl font-heading text-primary tracking-wide">Your stats</h2>
+        </motion.div>
+        <div className="grid gap-4 sm:grid-cols-3 relative z-10">
+          <StatsCard title="Games" value={user.stats.gamesPlayed} icon={Gamepad2} />
+          <StatsCard title="Wins" value={user.stats.wins} icon={Trophy} />
+          <StatsCard title="Best score" value={user.stats.bestScore} icon={Target} />
+        </div>
+      </PageTransition>
+    </div>
   );
 }

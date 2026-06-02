@@ -55,7 +55,7 @@ export default function Timer({
           fill="none"
           stroke="currentColor"
           strokeWidth="6"
-          className="text-muted/30"
+          className="text-border/30"
         />
         <motion.circle
           cx="50"
@@ -64,7 +64,7 @@ export default function Timer({
           fill="none"
           strokeWidth="6"
           strokeLinecap="round"
-          className={urgent ? "text-destructive" : "text-primary"}
+          className={urgent ? "text-destructive" : "text-secondary"}
           stroke="currentColor"
           strokeDasharray={circumference}
           strokeDashoffset={circumference}
@@ -73,7 +73,7 @@ export default function Timer({
         />
       </svg>
       <span
-        className={`absolute text-2xl font-bold tabular-nums ${urgent ? "text-destructive" : "text-foreground"}`}
+        className={`absolute text-3xl font-numbers font-bold tabular-nums ${urgent ? "text-destructive" : "text-primary"}`}
       >
         {remaining}
       </span>

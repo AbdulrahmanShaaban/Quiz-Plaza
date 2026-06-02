@@ -416,15 +416,71 @@ export const gameHandler = (io: Server, socket: Socket): void => {
     }
   });
 
+  // Update room settings event
+  socket.on("update_room", async (data: { code: string; category: string; difficulty: string; questionsCount: number; isPublic: boolean }) => {
+    try {
+      const { code } = data;
+      const userId = socket.data.userId;
+
+      const room = await Room.findOne({ code });
+
+      if (!room) {
+        socket.emit("error", { message: "Room not found." });
+        return;
+      }
+
+      // Only host can update room settings
+      if (room.host.toString() !== userId) {
+        socket.emit("error", { message: "Only room host can update settings." });
+        return;
+      }
+
+      if (room.status !== "waiting") {
+        socket.emit("error", { message: "Can only update room settings while in waiting state." });
+        return;
+      }
+
+      // Emit room_updated event to all players
+      io.to(code).emit("room_updated", {
+        category: data.category,
+        difficulty: data.difficulty,
+        questionsCount: data.questionsCount,
+        isPublic: data.isPublic,
+      });
+
+      console.log(`Room ${code} settings updated by host`);
+    } catch (error) {
+      console.error("Update room error:", error);
+      socket.emit("error", { message: "Error updating room settings." });
+    }
+  });
+
   // Disconnect event
-  socket.on("disconnect", () => {
+  socket.on("disconnect", async () => {
     console.log(`Socket disconnected: ${socket.id}`);
     const roomCode = socket.data.roomCode;
+    const userId = socket.data.userId;
 
     if (roomCode) {
       const gameState = activeGames.get(roomCode);
       if (gameState) {
         clearGameTimers(gameState);
+      }
+
+      // Check if disconnected user is the host of a waiting room
+      try {
+        const room = await Room.findOne({ code: roomCode });
+        if (room && room.status === "waiting" && room.host.toString() === userId) {
+          // Emit room_closed event to all players
+          io.to(roomCode).emit("room_closed", { message: "Room closed by host." });
+          
+          // Delete the room from DB
+          await Room.deleteOne({ code: roomCode });
+          
+          console.log(`Room ${roomCode} closed by host disconnect`);
+        }
+      } catch (error) {
+        console.error("Error handling disconnect:", error);
       }
     }
   });

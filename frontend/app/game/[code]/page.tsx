@@ -15,6 +15,8 @@ import { useAuthStore } from "@/lib/store/authStore";
 import { useGameStore } from "@/lib/store/gameStore";
 import { getSocket } from "@/lib/socket";
 import { QUESTION_DURATION_SECONDS } from "@/types/game";
+import Panda from "@/components/characters/Panda";
+import { motion } from "framer-motion";
 
 export default function GamePage() {
   const params = useParams();
@@ -89,9 +91,11 @@ export default function GamePage() {
 
   if (!currentQuestion && !showGameOver) {
     return (
-      <div className="mx-auto max-w-4xl p-8">
-        <Skeleton className="mb-4 h-32 w-full" />
-        <Skeleton className="h-64 w-full" />
+      <div className="min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
+        <div className="mx-auto max-w-4xl p-8">
+          <Skeleton className="mb-4 h-32 w-full rounded-2xl" />
+          <Skeleton className="h-64 w-full rounded-2xl" />
+        </div>
       </div>
     );
   }
@@ -99,72 +103,86 @@ export default function GamePage() {
   const disabled = hasSubmittedAnswer || phase === "revealing";
 
   return (
-    <PageTransition className="mx-auto max-w-6xl px-4 py-6">
-      <div className="mb-4 flex items-center justify-between">
-        <Badge variant="outline" className="font-mono">
-          Room {code}
-        </Badge>
-        {phase === "revealing" && (
-          <Badge className="bg-success/20 text-success">Results</Badge>
-        )}
-      </div>
+    <div className="min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
+      <PageTransition className="mx-auto max-w-6xl px-4 py-6 relative">
+        {/* Floating Panda mascot */}
+        <motion.div
+          animate={{ y: [0, -8, 0], rotate: [-2, 2, -2] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          className="absolute -right-4 top-0 hidden lg:block z-0 opacity-50"
+        >
+          <Panda className="w-24 h-24" />
+        </motion.div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
-        <div className="space-y-6">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-            <div className="flex shrink-0 justify-center sm:justify-start">
-              <Timer
-                resetKey={timerKey}
-                paused={phase === "revealing" || hasSubmittedAnswer}
-              />
-            </div>
-            <div className="flex-1">
-              <AnimatePresence mode="wait">
-                {currentQuestion && (
-                  <QuestionCard
-                    question={currentQuestion}
-                    questionIndex={questionIndex}
-                    totalQuestions={totalQuestions}
-                  />
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            {currentQuestion?.options.map((option, index) => (
-              <AnswerButton
-                key={`${questionIndex}-${index}`}
-                label={option}
-                index={index}
-                selected={selectedAnswerIndex === index}
-                disabled={disabled}
-                state={getButtonState(index)}
-                onSelect={handleSelect}
-              />
-            ))}
-          </div>
-
-          {hasSubmittedAnswer && phase === "playing" && (
-            <p className="text-center text-sm text-muted-foreground">
-              Answer locked in — waiting for other players…
-            </p>
+        <motion.div
+          whileHover={{ y: -4 }}
+          className="mb-4 bg-white rounded-2xl p-4 shadow-md border-2 border-border flex items-center justify-between relative z-10"
+        >
+          <Badge variant="outline" className="font-numbers text-lg border-accent text-accent font-bold">
+            Room {code}
+          </Badge>
+          {phase === "revealing" && (
+            <Badge className="bg-success/20 text-success font-sans font-bold border-success">Results</Badge>
           )}
+        </motion.div>
+
+        <div className="grid gap-6 lg:grid-cols-[1fr_280px] relative z-10">
+          <div className="space-y-6">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+              <div className="flex shrink-0 justify-center sm:justify-start">
+                <Timer
+                  resetKey={timerKey}
+                  paused={phase === "revealing" || hasSubmittedAnswer}
+                />
+              </div>
+              <div className="flex-1">
+                <AnimatePresence mode="wait">
+                  {currentQuestion && (
+                    <QuestionCard
+                      question={currentQuestion}
+                      questionIndex={questionIndex}
+                      totalQuestions={totalQuestions}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {currentQuestion?.options.map((option, index) => (
+                <AnswerButton
+                  key={`${questionIndex}-${index}`}
+                  label={option}
+                  index={index}
+                  selected={selectedAnswerIndex === index}
+                  disabled={disabled}
+                  state={getButtonState(index)}
+                  onSelect={handleSelect}
+                />
+              ))}
+            </div>
+
+            {hasSubmittedAnswer && phase === "playing" && (
+              <p className="text-center text-lg text-text/70 font-sans font-bold">
+                Answer locked in — waiting for other players…
+              </p>
+            )}
+          </div>
+
+          <LiveScoreboard
+            players={players}
+            answeredUserIds={answeredUserIds}
+            currentUserId={user?._id}
+          />
         </div>
 
-        <LiveScoreboard
-          players={players}
-          answeredUserIds={answeredUserIds}
+        {/* Bug 5: Game Over modal overlay */}
+        <GameOverModal
+          open={showGameOver}
+          results={finalResults}
           currentUserId={user?._id}
         />
-      </div>
-
-      {/* Bug 5: Game Over modal overlay */}
-      <GameOverModal
-        open={showGameOver}
-        results={finalResults}
-        currentUserId={user?._id}
-      />
-    </PageTransition>
+      </PageTransition>
+    </div>
   );
 }

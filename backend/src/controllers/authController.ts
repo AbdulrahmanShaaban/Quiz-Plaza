@@ -3,6 +3,7 @@ import jwt, { SignOptions } from "jsonwebtoken";
 import { z } from "zod/v4";
 import User from "../models/User.js";
 import sendEmail from "../utils/sendEmail.js";
+import passport from "passport";
 
 // --------------- Validation Schemas ---------------
 
@@ -217,5 +218,26 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     console.error("GetMe error:", error);
     res.status(500).json({ message: "Server error." });
+  }
+};
+
+// OAuth success handler - generates JWT token after successful OAuth
+export const oauthSuccess = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = req.user as any;
+    
+    // Sign token and set cookie
+    const token = signToken((user._id as unknown) as string);
+    setCookie(res, token);
+
+    // Return user without password
+    const userObj = user.toObject();
+    const { password: _, ...userWithoutPassword } = userObj;
+
+    // Redirect to frontend with success
+    res.redirect(`${process.env.CLIENT_URL}/auth/success?user=${encodeURIComponent(JSON.stringify(userWithoutPassword))}`);
+  } catch (error) {
+    console.error("OAuth success error:", error);
+    res.redirect(`${process.env.CLIENT_URL}/auth/error?message=Authentication failed`);
   }
 };
