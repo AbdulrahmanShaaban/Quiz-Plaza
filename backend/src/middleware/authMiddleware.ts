@@ -1,15 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import User, { IUser } from "../models/User.js";
-
-// Extend Express Request to include user
-declare global {
-  namespace Express {
-    interface Request {
-      user?: IUser;
-    }
-  }
-}
+import User from "../models/User.js";
 
 interface JwtPayload {
   userId: string;

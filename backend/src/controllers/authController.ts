@@ -224,7 +224,12 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
 // OAuth success handler - generates JWT token after successful OAuth
 export const oauthSuccess = async (req: Request, res: Response): Promise<void> => {
   try {
-    const user = req.user as any;
+    if (!req.user) {
+      res.redirect(`${process.env.CLIENT_URL}/auth/error?message=Authentication failed`);
+      return;
+    }
+
+    const user = req.user;
     
     // Sign token and set cookie
     const token = signToken((user._id as unknown) as string);
