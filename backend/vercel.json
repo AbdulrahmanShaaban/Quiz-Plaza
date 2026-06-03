@@ -2,5 +2,10 @@
   "buildCommand": "pnpm run build",
   "outputDirectory": "dist",
   "installCommand": "pnpm install",
-  "framework": null
+  "framework": null,
+  "functions": {
+    "dist/index.js": {
+      "runtime": "@vercel/node"
+    }
+  }
 }
