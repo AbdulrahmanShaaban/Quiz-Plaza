@@ -1,0 +1,15 @@
+{
+  "buildCommand": "cd backend && npm run build",
+  "outputDirectory": "backend/dist",
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "@vercel/node"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/backend/dist/index.js"
+    }
+  ]
+}

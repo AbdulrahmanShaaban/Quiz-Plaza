@@ -77,6 +77,10 @@ const startServer = async (): Promise<void> => {
   }
 };
 
-startServer();
+// Only start the server if not running in Vercel serverless environment
+if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+  startServer();
+}
 
+export default app;
 export { io };
