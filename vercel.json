@@ -1,0 +1,12 @@
+{
+  "buildCommand": "cd backend && pnpm run build",
+  "outputDirectory": "backend/dist",
+  "installCommand": "cd backend && pnpm install",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/backend/dist/index.js"
+    }
+  ]
+}
