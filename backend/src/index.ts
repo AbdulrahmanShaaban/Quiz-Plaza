@@ -6,7 +6,6 @@ import { Server } from "socket.io";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
-import passport from "./config/passport.js";
 
 // Route imports
 import authRoutes from "./routes/auth.js";
@@ -32,7 +31,6 @@ const io = new Server(server, {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(passport.initialize());
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:3000",
