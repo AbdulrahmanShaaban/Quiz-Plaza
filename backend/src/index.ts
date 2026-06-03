@@ -1,6 +1,6 @@
 import "./config/env.js";
 
-import express from "express";
+import express, { Express } from "express";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
@@ -17,7 +17,7 @@ import roomRoutes from "./routes/rooms.js";
 // Socket handler import
 import { gameHandler } from "./socket/gameHandler.js";
 
-const app = express();
+const app: Express = express();
 const server = http.createServer(app);
 
 // Socket.io setup
