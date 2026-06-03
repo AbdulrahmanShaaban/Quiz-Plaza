@@ -625,7 +625,7 @@ export default function HomePage() {
                 <Ninja className="w-8 h-8" />
                 <h3 className="text-3xl font-heading text-primary">Quiz Plaza</h3>
               </div>
-              <p className="text-muted text-sm font-sans font-semibold">Battle your friends in real-time</p>
+              <p className="text-black text-sm font-sans font-semibold">Battle your friends in real-time</p>
             </div>
 
             {/* Center Column */}
@@ -683,7 +683,7 @@ export default function HomePage() {
 
           {/* Bottom Bar */}
           <div className="border-t border-border mt-8 pt-8 text-center">
-            <p className="text-muted text-sm font-sans font-semibold">
+            <p className="text-black text-sm font-sans font-semibold">
               © 2026 Quiz Plaza. All rights reserved.
             </p>
           </div>
