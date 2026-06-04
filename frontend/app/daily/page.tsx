@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DailyChallengeIcon } from "@/components/icons/DailyChallengeIcon";
 import { FlameIcon } from "@/components/icons/FlameIcon";
@@ -9,36 +9,39 @@ import { getDailyQuestions, OfflineQuestion } from "@/lib/questions";
 type GameState = "menu" | "playing" | "results";
 
 export default function DailyPage() {
-  const [gameState, setGameState] = useState<GameState>(() => {
-    const lastPlayed = localStorage.getItem("dailyLastPlayed");
-    const today = new Date().toDateString();
-    return lastPlayed === today ? "results" : "menu";
-  });
+  const [gameState, setGameState] = useState<GameState>("menu");
   const [questions, setQuestions] = useState<OfflineQuestion[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<number[]>(() => {
-    const lastPlayed = localStorage.getItem("dailyLastPlayed");
-    const today = new Date().toDateString();
-    if (lastPlayed === today) {
-      const savedAnswers = localStorage.getItem("dailyAnswers");
-      return savedAnswers ? JSON.parse(savedAnswers) : [];
-    }
-    return [];
-  });
+  const [answers, setAnswers] = useState<number[]>([]);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [streak, setStreak] = useState(() => {
-    const saved = localStorage.getItem("dailyStreak");
-    return saved ? parseInt(saved) : 0;
-  });
-  const [lastPlayedDate, setLastPlayedDate] = useState(() => {
-    return localStorage.getItem("dailyLastPlayed");
-  });
+  const [streak, setStreak] = useState(0);
+  const [lastPlayedDate, setLastPlayedDate] = useState<string | null>(null);
+  const dataLoadedRef = useRef(false);
   const dailyNumber = (() => {
     const referenceDate = new Date("2024-01-01");
     const today = new Date();
     const diffTime = Math.abs(today.getTime() - referenceDate.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   })();
+
+  useEffect(() => {
+    if (dataLoadedRef.current) return;
+    dataLoadedRef.current = true;
+
+    // Load all data from localStorage
+    const savedStreak = localStorage.getItem("dailyStreak");
+    const savedDate = localStorage.getItem("dailyLastPlayed");
+    const savedAnswers = localStorage.getItem("dailyAnswers");
+    const today = new Date().toDateString();
+    
+    // Defer setState to avoid synchronous calls
+    setTimeout(() => {
+      setStreak(savedStreak ? parseInt(savedStreak) : 0);
+      setLastPlayedDate(savedDate);
+      setAnswers(savedDate === today && savedAnswers ? JSON.parse(savedAnswers) : []);
+      setGameState(savedDate === today ? "results" : "menu");
+    }, 0);
+  }, []);
 
   const canPlayToday = () => {
     const today = new Date().toDateString();

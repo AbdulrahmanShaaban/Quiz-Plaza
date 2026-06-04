@@ -44,11 +44,21 @@ export default function SoloPage() {
   const [answers, setAnswers] = useState<number[]>([]);
   const [timeLeft, setTimeLeft] = useState(20);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [bestScores, setBestScores] = useState<Record<string, number>>(() => {
-    const saved = localStorage.getItem("soloBestScores");
-    return saved ? JSON.parse(saved) : {};
-  });
+  const [bestScores, setBestScores] = useState<Record<string, number>>({});
   const timeUpHandledRef = useRef(false);
+  const dataLoadedRef = useRef(false);
+
+  useEffect(() => {
+    if (dataLoadedRef.current) return;
+    dataLoadedRef.current = true;
+
+    const saved = localStorage.getItem("soloBestScores");
+    if (saved) {
+      setTimeout(() => {
+        setBestScores(JSON.parse(saved));
+      }, 0);
+    }
+  }, []);
 
   const saveBestScore = useCallback((category: string, score: number) => {
     setBestScores(prev => {
