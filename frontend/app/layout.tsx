@@ -4,8 +4,13 @@ import Navbar from "@/components/shared/Navbar";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Quiz Plaza — Real-Time Multiplayer Quiz",
-  description: "Compete with friends in real-time multiplayer quiz battles.",
+  title: "Quiz Plaza",
+  description: "Battle your friends in real-time quiz combat",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
