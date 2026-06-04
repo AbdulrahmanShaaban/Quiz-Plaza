@@ -7,13 +7,19 @@ import { LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import Avatar from "@/components/shared/Avatar";
 import Ninja from "@/components/characters/Ninja";
+import { MillionaireIcon } from "@/components/icons/MillionaireIcon";
+import { SoloQuizIcon } from "@/components/icons/SoloQuizIcon";
+import { DailyChallengeIcon } from "@/components/icons/DailyChallengeIcon";
 import { useAuthStore } from "@/lib/store/authStore";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/rooms", label: "Rooms" },
-  { href: "/profile", label: "Profile" },
+  { href: "/dashboard", label: "Dashboard", icon: null },
+  { href: "/rooms", label: "Rooms", icon: Ninja },
+  { href: "/millionaire", label: "Millionaire", icon: MillionaireIcon },
+  { href: "/solo", label: "Solo Quiz", icon: SoloQuizIcon },
+  { href: "/daily", label: "Daily", icon: DailyChallengeIcon },
+  { href: "/profile", label: "Profile", icon: null },
 ];
 
 export default function Navbar() {
@@ -43,26 +49,30 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6">
           {isAuthenticated &&
-            navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "text-base font-sans font-medium transition-colors relative",
-                  pathname === link.href ? "text-secondary" : "text-text/70 hover:text-primary"
-                )}
-              >
-                {link.label}
-                {pathname === link.href && (
-                  <motion.div
-                    layoutId="navbar-indicator"
-                    className="absolute -bottom-1 left-0 right-0 h-[2px] bg-secondary rounded-full"
-                  />
-                )}
-              </Link>
-            ))}
+            navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "flex items-center gap-2 text-base font-sans font-medium transition-colors relative",
+                    pathname === link.href ? "text-secondary" : "text-text/70 hover:text-primary"
+                  )}
+                >
+                  {Icon && <Icon size={20} />}
+                  {link.label}
+                  {pathname === link.href && (
+                    <motion.div
+                      layoutId="navbar-indicator"
+                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-secondary rounded-full"
+                    />
+                  )}
+                </Link>
+              );
+            })}
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
@@ -94,7 +104,7 @@ export default function Navbar() {
                 <motion.button 
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-5 py-2 bg-secondary text-white font-heading tracking-wide rounded-xl shadow-[0_3px_0_#9d1c35] hover:translate-y-[1px] hover:shadow-[0_2px_0_#9d1c35] transition-all"
+                  className="px-5 py-2 bg-secondary text-white font-heading tracking-wide rounded-xl shadow-[0_3px_0_#9d1c35] hover:translate-y-px hover:shadow-[0_2px_0_#9d1c35] transition-all"
                 >
                   Sign up
                 </motion.button>
@@ -124,19 +134,23 @@ export default function Navbar() {
           <div className="flex flex-col p-4 gap-2">
             {isAuthenticated ? (
               <>
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      "p-3 rounded-xl font-sans font-medium",
-                      pathname === link.href ? "bg-secondary/10 text-secondary" : "text-text/70"
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                {navLinks.map((link) => {
+                  const Icon = link.icon;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 p-3 rounded-xl font-sans font-medium",
+                        pathname === link.href ? "bg-secondary/10 text-secondary" : "text-text/70"
+                      )}
+                    >
+                      {Icon && <Icon size={24} />}
+                      {link.label}
+                    </Link>
+                  );
+                })}
                 <button 
                   onClick={handleLogout}
                   className="p-3 text-left rounded-xl font-sans font-medium text-secondary flex items-center gap-2"

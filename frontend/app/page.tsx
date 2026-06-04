@@ -9,6 +9,9 @@ import PageTransition from "@/components/motion/PageTransition";
 import Avatar from "@/components/shared/Avatar";
 import api from "@/lib/axios";
 import { Trophy, Medal, Award } from "lucide-react";
+import { MillionaireIcon } from "@/components/icons/MillionaireIcon";
+import { SoloQuizIcon } from "@/components/icons/SoloQuizIcon";
+import { DailyChallengeIcon } from "@/components/icons/DailyChallengeIcon";
 
 // Village Skyline SVG with simple rooftops and a moon
 const Skyline = () => (
@@ -396,6 +399,78 @@ export default function HomePage() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Game Modes Section */}
+      <section className="py-24 px-4 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <motion.h2 
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-5xl font-heading text-primary tracking-wide text-center mb-16"
+          >
+            Game Modes
+          </motion.h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: <MillionaireIcon size={80} />,
+                title: "Who Wants to Be a Millionaire?",
+                description: "Answer 15 questions with increasing difficulty. Use lifelines wisely and climb the prize ladder to win up to $8,000,000!",
+                color: "#FFD700",
+                href: "/millionaire",
+                accent: "#1A1A2E"
+              },
+              {
+                icon: <SoloQuizIcon size={80} />,
+                title: "Solo Quiz",
+                description: "Test your knowledge across 6 categories. Earn ninja ranks from Rookie to Shadow Ninja based on your performance!",
+                color: "#E94560",
+                href: "/solo",
+                accent: "#1A1A2E"
+              },
+              {
+                icon: <DailyChallengeIcon size={80} />,
+                title: "Daily Challenge",
+                description: "Same 10 questions for everyone each day. Build your streak and compete with friends on the daily leaderboard!",
+                color: "#7B2FBE",
+                href: "/daily",
+                accent: "#1A1A2E"
+              }
+            ].map((mode, index) => (
+              <Link key={mode.title} href={mode.href}>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.2 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-white rounded-2xl shadow-lg border-2 p-8 text-center cursor-pointer relative overflow-hidden"
+                  style={{ borderColor: mode.color }}
+                >
+                  <div className="mb-6 flex justify-center">{mode.icon}</div>
+                  <h3 className="text-2xl font-heading text-primary mb-4" style={{ color: mode.color }}>
+                    {mode.title}
+                  </h3>
+                  <p className="text-text/70 font-sans font-bold mb-6">
+                    {mode.description}
+                  </p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-6 py-3 text-white font-heading font-bold rounded-xl shadow-md transition-all"
+                    style={{ backgroundColor: mode.color }}
+                  >
+                    Play Now
+                  </motion.button>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
