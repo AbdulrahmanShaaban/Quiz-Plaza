@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
-
 const AUTH_ROUTES = ["/auth/login", "/auth/register", "/auth/verify"];
 const PROTECTED_PREFIXES = ["/dashboard", "/profile", "/game/"];
 const PROTECTED_EXACT = ["/rooms"];
@@ -16,17 +15,17 @@ function isProtectedPath(pathname: string): boolean {
 }
 
 function isAuthRoute(pathname: string): boolean {
-  return AUTH_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+  return AUTH_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
 }
 
 async function validateSession(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get("token")?.value;
   if (!token) return false;
-
   try {
     const response = await fetch(`${API_URL}/api/auth/me`, {
       headers: { cookie: `token=${token}` },
-      cache: "no-store",
     });
     return response.ok;
   } catch {
@@ -34,7 +33,7 @@ async function validateSession(request: NextRequest): Promise<boolean> {
   }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (
